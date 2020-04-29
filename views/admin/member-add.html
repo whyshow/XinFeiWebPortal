@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>添加用户</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/admin/lib/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="/static/admin/css/font.css">
+    <link rel="stylesheet" href="/static/admin/css/xadmin.css">
+    <link rel="stylesheet" href="/static/admin/css/extend1.css">
+    <script src="/static/admin/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/admin/js/xadmin.js"></script>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+</head>
+<body>
+
+<form class="layui-form layui-form-pane" action="" lay-filter="example">
+    <div class="layui-form-item">
+        <label class="layui-form-label">学号/账号</label>
+        <div class="layui-input-block">
+            <input type="text" id="studentnumber" placeholder="请输入学号/账号" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-inline">
+            <input type="text" id="name" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-inline">
+            <input type="password" id="password" placeholder="请输入密码" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">年级</label>
+            <div class="layui-input-block">
+                <input type="text" id="grade" placeholder="如：2020" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">班级</label>
+            <div class="layui-input-inline">
+                <input type="text" id="class" autocomplete="off" placeholder="如：软件191" class="layui-input">
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">专业方向</label>
+        <div class="layui-input-inline">
+            <input type="text" id="direction" placeholder="请输入专业方向" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">QQ号</label>
+            <div class="layui-input-block">
+                <input type="text" id="qq" placeholder="" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">手机号码</label>
+            <div class="layui-input-inline">
+                <input type="text" id ="phonenumber" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">座右铭</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入座右铭" id="motto" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item" style="right: 50%;position: absolute">
+        <button class="layui-btn" lay-submit="" type="button" onclick="submits()">提交</button>
+    </div>
+</form>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    function submits(){
+        var data = {};
+        data["User_account"] = $("#studentnumber").val()
+        data["User_name"] = $("#name").val()
+        data["User_password"] = $("#password").val()
+        data["User_grade"] = $("#grade").val()
+        data["User_class"] = $("#class").val()
+        data["User_direction"] = $("#direction").val()
+        data["User_qq"] = $("#qq").val()
+        data["User_phone"] = $("#phonenumber").val()
+        data["User_motto"] = $("#motto").val()
+        // data.push(data);
+         var jsonString = JSON.stringify(data);
+        $.ajax({
+            url: '/admin/user/add',//地址
+            dataType: 'json',//数据类型
+            type: 'POST',//类型
+            data: jsonString,
+            success:function (data) {
+                if (data.code ==1){
+                    layer.msg('添加成功', {
+                        icon: 1,
+                        time: 1500
+                    }, function(){
+                        //刷新父布局
+                        parent.location.reload();
+                        // 获得frame索引
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                    });
+                } else {
+                    layer.msg('添加失败!', {icon: 5, time: 1500});
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>
