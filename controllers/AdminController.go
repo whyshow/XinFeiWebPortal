@@ -17,16 +17,19 @@ type AdminController struct {
 func (c *AdminController) Home() {
 	id := c.GetSession("admin_id")
 	c.Data["info"] = models.QueryAdmin(id)
-	c.TplName = "admin/index.html"
+	c.TplName = "admin/后台首页页面.html"
 }
 
 // 基础信息统计显示页面
 func (c *AdminController) Welcome() {
 	t := time.Now()
 	sy := models.GetSystemStatus()
+	c.Data["UserCount"] = models.GetUserCount()
+	c.Data["ArticleCount"] = models.GetArticleCount()
+
 	c.Data["System"] = sy
 	c.Data["time"] = utils.Millisecond(time.Since(t))
-	c.TplName = "admin/welcome.html"
+	c.TplName = "admin/系统信息显示页面.html"
 }
 
 // 获取系统状态信息
@@ -37,9 +40,11 @@ func (c *AdminController) GetSystemStatus() {
 	c.ServeJSON()
 }
 
-// 登录页面
+// 登录页面，判断是否数据库有admin信息，如果没有则跳转到注册页面
 func (c *AdminController) LoginPage() {
-	c.TplName = "admin/login.tpl"
+	//
+
+	c.TplName = "admin/后台登录页面.tpl"
 }
 
 // 管理员登录操作
@@ -78,5 +83,5 @@ func (c *AdminController) RebootSystem() {
 		log.Println(err)
 	}
 
-	c.TplName = "admin/index.html"
+	c.TplName = "admin/后台首页页面.html"
 }

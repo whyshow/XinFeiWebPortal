@@ -11,5 +11,5 @@ type WebController struct {
 func (c *WebController) Home() {
 	c.Data["Website"] = "beego.me"
 	c.Data["Email"] = "astaxie@gmail.com"
-	c.TplName = "index.tpl"
+	c.TplName = "首页.tpl"
 }

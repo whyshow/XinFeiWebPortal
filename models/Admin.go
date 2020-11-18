@@ -5,6 +5,9 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+/**
+ * 管理员数据库模型
+ */
 //管理员处理
 type Xinfei_Admin struct {
 	Admin_id         string `orm:"column(admin_id);pk"`
@@ -33,11 +36,20 @@ func AdminLogin(admin Xinfei_Admin) (bool, string, Xinfei_Admin) {
 func QueryAdmin(admin_id interface{}) Xinfei_Admin {
 	o := orm.NewOrm()
 	admin := Xinfei_Admin{}
-	if err := o.Raw("SELECT xinfei_admin.admin_id,xinfei_admin.admin_name,xinfei_admin.admin_permission,xinfei_admin.admin_icon FROM xinfei_admin WHERE admin_id = ? ", admin_id).QueryRow(&admin); err == nil {
-		return admin
+	if admin_id == nil {
+		if err := o.Raw("SELECT * FROM xinfei_admin WHERE admin_name = 'admin'").QueryRow(&admin); err == nil {
+			return admin
+		} else {
+			return admin
+		}
 	} else {
-		return admin
+		if err := o.Raw("SELECT xinfei_admin.admin_id,xinfei_admin.admin_name,xinfei_admin.admin_permission,xinfei_admin.admin_icon FROM xinfei_admin WHERE admin_id = ? ", admin_id).QueryRow(&admin); err == nil {
+			return admin
+		} else {
+			return admin
+		}
 	}
+
 }
 
 //注册超级管理员

@@ -7,7 +7,9 @@ import (
 	"time"
 )
 
-// 用户表模型
+/**
+ * 用户表增删改查数据模型
+ */
 type Xinfei_user struct {
 	User_account    string `orm:"column(user_account);pk"` //账号
 	User_name       string
@@ -24,30 +26,72 @@ type Xinfei_user struct {
 	Register_date   string
 }
 
-//获取user表中的所有用户及信息 return 查询的数据，受影响行数，错误
+// 根据年级查询行数
+func UserGetAllGrade(grade string, p int, num int) ([]Xinfei_user, int64, error) {
+	o := orm.NewOrm()
+	var user []Xinfei_user
+	sql := " "
+
+	if p > 1 {
+		sql = "SELECT * FROM xinfei_user WHERE user_grade =" + "'" + grade + "'" + " limit " + strconv.Itoa(p*num-num) + "," + strconv.Itoa(num)
+	} else {
+		sql = "SELECT * FROM xinfei_user WHERE user_grade =" + "'" + grade + "'" + " limit 0" + "," + strconv.Itoa(int(num))
+	}
+
+	// 返回行数或者错误信息
+	if _, err := o.Raw(sql).QueryRows(&user); err == nil {
+		b := []Xinfei_user{}
+		for _, v := range user {
+			v.User_password = ""
+			b = append(b, v)
+		}
+		user = nil
+
+		cnt, _ := o.QueryTable("xinfei_user").Filter("user_grade", grade).Count()
+		return b, cnt, err
+	} else {
+		return user, 0, err
+	}
+	return nil, 0, nil
+}
+
+//按页码获取user表中的用户及信息 return 查询的数据，受影响行数，错误
 func UserGetAllInfo(activate string, p int, num int, adc string) ([]Xinfei_user, int64, error) {
 	o := orm.NewOrm()
 	user := []Xinfei_user{}
 	sql := ""
 	if p == 1 && activate == "" || activate == " " {
-		sql = "SELECT * FROM xinfei_user limit 0" + "," + strconv.Itoa(num)
+		sql = "SELECT * FROM xinfei_user" + " ORDER BY user_grade " + adc + " limit 0" + "," + strconv.Itoa(num)
 	} else if p > 1 && activate == "" || activate == " " {
 		s := p*num - num
-		sql = "SELECT * FROM xinfei_user limit " + strconv.Itoa(s) + "," + strconv.Itoa(num) + " ORDER BY user_grade " + adc
+		sql = "SELECT * FROM xinfei_user" + " ORDER BY user_grade " + adc + " limit " + strconv.Itoa(s) + "," + strconv.Itoa(num)
 	} else {
-		sql = "SELECT * FROM xinfei_user WHERE user_activate = " + "'" + activate + "'" + " ORDER BY user_grade " + adc
+		sql = "SELECT * FROM xinfei_user" + " WHERE user_activate = " + "'" + activate + "'" + " ORDER BY user_grade " + adc
 	}
 	// 返回行数或者错误信息
 	if num, err := o.Raw(sql).QueryRows(&user); err == nil {
+		b := []Xinfei_user{}
+		for _, v := range user {
+			v.User_password = ""
+			b = append(b, v)
+		}
+		user = nil
 		if p == 0 {
-			return user, num, err
+			return b, num, err
 		} else {
 			cnt, _ := o.QueryTable("xinfei_user").Count()
-			return user, cnt, err
+			return b, cnt, err
 		}
 	} else {
 		return user, 0, err
 	}
+}
+
+//获取用户表中的用户数量
+func GetUserCount() int64 {
+	o := orm.NewOrm()
+	cnt, _ := o.QueryTable("xinfei_user").Count()
+	return cnt
 }
 
 // 根据条件获取user表中单个user信息 return 查询的数据，错误
@@ -69,7 +113,13 @@ func UserGetWhereAllInfo(unknown string) ([]Xinfei_user, int64, error) {
 	user := []Xinfei_user{}
 	sql := "SELECT * FROM xinfei_user WHERE user_account = " + "'" + unknown + "'" + " OR  user_name = " + "'" + unknown + "'" + " OR  user_grade = " + "'" + unknown + "'" + " OR  user_class = " + "'" + unknown + "'" + " OR  user_direction = " + "'" + unknown + "'" + " OR  user_phone = " + "'" + unknown + "'" + " OR  user_qq = " + "'" + unknown + "'" + "" + " OR  user_motto = " + "'" + unknown + "'" + ""
 	if numb, err := o.Raw(sql).QueryRows(&user); err == nil {
-		return user, numb, err
+		b := []Xinfei_user{}
+		for _, v := range user {
+			v.User_password = ""
+			b = append(b, v)
+		}
+		user = nil
+		return b, numb, err
 	} else {
 		return user, numb, err
 	}

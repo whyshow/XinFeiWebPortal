@@ -287,8 +287,11 @@ func Paginator(page, prepage int, nums int64) map[string]interface{} {
 			pages[i] = i + 1
 		}
 		firstpage = int(math.Max(float64(1), float64(page-1)))
-		lastpage = page + 1
-
+		if totalpages == page {
+			lastpage = page
+		} else {
+			lastpage = page + 1
+		}
 	}
 
 	paginatorMap := make(map[string]interface{})

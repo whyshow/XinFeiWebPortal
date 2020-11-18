@@ -2,6 +2,9 @@ package models
 
 import "time"
 
+/**
+ * 日访问量、日访客 数据模型
+ */
 type PvUv struct {
 	Pv int
 	Uv int

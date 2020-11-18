@@ -15,7 +15,7 @@ func init() {
 	beego.Router("admin/login", &controllers.AdminController{}, "GET:LoginPage")
 	beego.Router("manage/request_login", &controllers.AdminController{}, "POST:AdminLogin")
 	beego.Router("admin/exit", &controllers.AdminController{}, "GET:ExitLogin")
-
+	// 成员
 	beego.Router("admin/user/home", &controllers.UserController{}, "GET:UserHome")                             // 用户的首页
 	beego.Router("admin/user/page/add", &controllers.UserController{}, "GET:UserAddPage")                      // 添加用户页面
 	beego.Router("admin/user/add", &controllers.UserController{}, "POST:UserAdd")                              // 单个添加用户
@@ -27,17 +27,21 @@ func init() {
 	beego.Router("admin/user/alter/page/user", &controllers.UserController{}, "GET:UserAlterInfoPage")         // 修改用户信息页面
 	beego.Router("admin/user/alter/user", &controllers.UserController{}, "POST:UserAlterInfo")                 // 修改用户信息
 	beego.Router("admin/user/query/user", &controllers.UserController{}, "POST:UserQuery")                     // 条件查询
-	beego.Router("/member", &controllers.UserController{}, "GET:MemberAll")                                    //
-
 	// 文章
-	//beego.Router("article/member", &controllers.ArticleController{},"GET:ArticleQueryOne") //
+	beego.Router("admin/article/home", &controllers.ArticleController{}, "GET:ArticleHome")
+	beego.Router("admin/article/query", &controllers.ArticleController{}, "GET:ArticleQueryAllDate")
+	beego.Router("article/add", &controllers.ArticleController{}, "POST:ArticleAddOne")
+
 	beego.Router("/article/:id", &controllers.ArticleController{}, "GET:ArticleQueryOne")
-	beego.Router("/article/add", &controllers.ArticleController{}, "POST:ArticleAddOne")
-	beego.Router("/article/all", &controllers.ArticleController{}, "GET:ArticleQueryAll")
 
-	// 重启系统
-	beego.Router("admin/reboot_system", &controllers.AdminController{}, "GET:RebootSystem")
+	//API
+	beego.Router("/member", &controllers.UserController{}, "GET:MemberAll")                  // 查询成员
+	beego.Router("/member/:id", &controllers.UserController{}, "GET:UserQueryOne")           // 查询成员详情
+	beego.Router("/article", &controllers.ArticleController{}, "GET:ArticleQueryAllDate")    //查询文章列表（按日期）
+	beego.Router("/article/hot", &controllers.ArticleController{}, "GET:ArticleQueryAllHot") //查询文章列表（按热度值）
+	beego.Router("/article/:id", &controllers.ArticleController{}, "GET:ArticleQueryOne")    // 查询文章详情
 
-	//API 返回JSON数据
-	beego.Router("admin/getsystemstatus", &controllers.AdminController{}, "GET:GetSystemStatus")
+	beego.Router("admin/getsystemstatus", &controllers.AdminController{}, "GET:GetSystemStatus") //返回JSON数据
+	beego.Router("admin/reboot_system", &controllers.AdminController{}, "GET:RebootSystem")      //重启系统
+
 }

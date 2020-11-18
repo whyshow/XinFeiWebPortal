@@ -18,20 +18,20 @@ func (c *UserController) UserHome() {
 	t := time.Now()
 	if p, err := c.GetInt("p"); err == nil {
 		//查询用户列表打包成json数据
-		if user, num, err := models.UserGetAllInfo("", p, 6, ""); err == nil {
+		if user, num, err := models.UserGetAllInfo("", p, 6, "DESC"); err == nil {
 			//制作分页数据
 			c.Data["json"] = map[string]interface{}{"code": 1, "message": "请求成功", "time": utils.Millisecond(time.Since(t)), "result": user, "page": utils.Paginator(p, 6, num)}
 		}
 	} else {
 		//查询用户列表打包成json数据
-		if user, num, err := models.UserGetAllInfo("", 1, 6, ""); err == nil {
+		if user, num, err := models.UserGetAllInfo("", 1, 6, "DESC"); err == nil {
 			//制作分页数据
 			c.Data["json"] = map[string]interface{}{"code": 1, "message": "请求成功", "time": utils.Millisecond(time.Since(t)), "result": user, "page": utils.Paginator(1, 6, num)}
 			//显示前端页面
 
 		}
 	}
-	c.TplName = "admin/member-list.html"
+	c.TplName = "admin/用户列表及管理页面.html"
 }
 
 // 添加单个用户的页面
@@ -60,7 +60,6 @@ func (c *UserController) UserAdd() {
 }
 
 // 内容：根据学号删除指定的人的信息
-//
 func (c *UserController) UserDelete() {
 	t := time.Now()
 	if num, err := models.UserDeleteOne(c.GetString("account")); err == nil {
@@ -74,7 +73,7 @@ func (c *UserController) UserDelete() {
 
 // 添加单个用户的页面
 func (c *UserController) UserAddPage() {
-	c.TplName = "admin/member-add.html"
+	c.TplName = "admin/添加用户页面.html"
 }
 
 // 修改用户密码页面
@@ -117,7 +116,7 @@ func (c *UserController) UserAlterInfoPage() {
 	} else {
 		c.Data["json"] = map[string]interface{}{"code": 0, "message": "查询失败", "time": utils.Millisecond(time.Since(t)), "result": err}
 	}
-	c.TplName = "admin/member-edit.html"
+	c.TplName = "admin/用户信息修改页面.html"
 }
 
 // 内容：修改用户信息
@@ -150,41 +149,67 @@ func (c *UserController) UserQuery() {
 	}
 }
 
+// 内容：查询一个成员信息
+func (c *UserController) UserQueryOne() {
+	t := time.Now()
+	if user, err := models.UserGetInfoOne(c.Ctx.Input.Param(":id")); err == nil {
+		c.Data["json"] = map[string]interface{}{"code": 1, "message": "查询成功", "time": utils.Millisecond(time.Since(t)), "result": user}
+		c.ServeJSON()
+	} else {
+		c.Data["json"] = map[string]interface{}{"code": 0, "message": "查询失败", "time": utils.Millisecond(time.Since(t)), "result": err}
+		c.ServeJSON()
+	}
+}
+
 // 内容：前端查询所有用户  返回 所有用户的数据（不包含密码）
 func (c *UserController) MemberAll() {
 	t := time.Now()
-	activate := c.GetString("activate")
-	desc := c.GetString("grade") //降序
-	account := c.GetString("account")
-	if account != "" {
-		if user, err := models.UserGetInfoOne(account); err == nil {
-			c.Data["json"] = map[string]interface{}{"code": 1, "message": "查询成功", "time": utils.Millisecond(time.Since(t)), "result": user}
+	//	activate := c.GetString("activate")
+	grade := c.GetString("grade") //升降序
+	p, _ := c.GetInt("p")         //页码
+	//	account := c.GetString("account")
+
+	//按年级查询
+	if grade != " " { //两个条件同时达成
+		if user, nums, err := models.UserGetAllGrade(grade, p, 5); err == nil {
+			c.Data["json"] = map[string]interface{}{"code": 1, "message": "查询成功", "time": utils.Millisecond(time.Since(t)), "result": user, "page": utils.Paginator(p, 5, nums)}
 			c.ServeJSON()
 		} else {
 			c.Data["json"] = map[string]interface{}{"code": 0, "message": "查询失败", "time": utils.Millisecond(time.Since(t)), "result": user}
 			c.ServeJSON()
 		}
-	} else if activate != "" {
-		adc := "ASC"
-		if desc == "desc" {
-			adc = "DESC"
-		} else if desc == "asc" {
-			adc = "ASC"
-		}
-		if user, num, err := models.UserGetAllInfo(activate, 0, 0, adc); err == nil {
-			if num > 1 {
+	}
+
+	/*
+		if desc != "" {
+			if user, err := models.UserGetAllInfo(1); err == nil {
 				c.Data["json"] = map[string]interface{}{"code": 1, "message": "查询成功", "time": utils.Millisecond(time.Since(t)), "result": user}
 				c.ServeJSON()
 			} else {
-				c.Data["json"] = map[string]interface{}{"code": 0, "message": "未查询到", "time": utils.Millisecond(time.Since(t)), "result": user}
+				c.Data["json"] = map[string]interface{}{"code": 0, "message": "查询失败", "time": utils.Millisecond(time.Since(t)), "result": user}
+				c.ServeJSON()
+			}
+		} else if activate != "" {  //
+			adc := "ASC"
+			if desc == "desc" {
+				adc = "DESC"
+			} else if desc == "asc" {
+				adc = "ASC"
+			}
+			if user, num, err := models.UserGetAllInfo(activate, 0, 0, adc); err == nil {
+				if num > 1 {
+					c.Data["json"] = map[string]interface{}{"code": 1, "message": "查询成功", "time": utils.Millisecond(time.Since(t)), "result": user}
+					c.ServeJSON()
+				} else {
+					c.Data["json"] = map[string]interface{}{"code": 0, "message": "未查询到", "time": utils.Millisecond(time.Since(t)), "result": user}
+					c.ServeJSON()
+				}
+			} else {
+				c.Data["json"] = map[string]interface{}{"code": 0, "message": "查询失败", "time": utils.Millisecond(time.Since(t)), "result": err}
 				c.ServeJSON()
 			}
 		} else {
-			c.Data["json"] = map[string]interface{}{"code": 0, "message": "查询失败", "time": utils.Millisecond(time.Since(t)), "result": err}
+			c.Data["json"] = map[string]interface{}{"code": 0, "message": "参数错误", "time": utils.Millisecond(time.Since(t)), "result": nil}
 			c.ServeJSON()
-		}
-	} else {
-		c.Data["json"] = map[string]interface{}{"code": 0, "message": "参数错误", "time": utils.Millisecond(time.Since(t)), "result": nil}
-		c.ServeJSON()
-	}
+		}*/
 }

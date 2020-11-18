@@ -76,3 +76,11 @@ func ConfigINIT() *goconfig.ConfigFile {
 	config, _ := goconfig.LoadConfigFile("conf/init.ini")
 	return config
 }
+
+//mac 下打包linux CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
+//mac 下打包windows CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build
+// set GOARCH=amd64
+// set GOOS=linux
+// go build
+// chmod +x    赋予执行权限
+// nohup ./XFRPW

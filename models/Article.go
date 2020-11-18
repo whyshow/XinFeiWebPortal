@@ -3,10 +3,13 @@ package models
 import (
 	"../utils"
 	"github.com/astaxie/beego/orm"
+	"strconv"
 	"time"
 )
 
-//操作文章表的数据模型
+/**
+ * 文章表的增删改查数据模型
+ */
 
 // 文章表的映射模型
 type Xinfei_article struct {
@@ -17,16 +20,14 @@ type Xinfei_article struct {
 	Article_category string //文章类别
 	Article_date     string //文章发布时间
 	Article_hot      int64  //文章热度
-	Article_display  int64  //文章是否上线。 0或者1 -》下线/上线
 }
 
 // 插入一篇文章
 func ArticleInsertOne(artivle Xinfei_article) error {
 	o := orm.NewOrm()
-	artivle.Article_id = utils.Random(6)
-	artivle.Article_hot = 1
-	artivle.Article_display = 1
-	artivle.Article_date = time.Now().Format("2006-01-02")
+	artivle.Article_id = utils.Random(6)                            //生成文章id
+	artivle.Article_hot = 1                                         //文章默认热度为 1
+	artivle.Article_date = time.Now().Format("2006-01-02 15:04:05") //添加文章的日期时间
 	if _, err := o.Insert(&artivle); err == nil {
 		return err
 	} else {
@@ -49,7 +50,7 @@ func ArticleUpdateOne(artivle Xinfei_article) (int64, error) {
 	}
 }
 
-// 删除一篇文章
+// 删除一篇文章 (完成)
 func ArticleDeleteOne(id string) (int64, error) {
 	o := orm.NewOrm()
 	if num, err := o.Delete(&Xinfei_article{Article_id: id}); err == nil {
@@ -59,32 +60,32 @@ func ArticleDeleteOne(id string) (int64, error) {
 	}
 }
 
-// 上下线一篇文章
-func ArticleActivityOne(id string) (int64, error) {
-	o := orm.NewOrm()
-	article := Xinfei_article{Article_id: id}
-	if err := o.Read(&article); err == nil {
-		if article.Article_display == 0 {
-			article.Article_display = 1
-			if num, err := o.Update(&article); err == nil {
-				return num, err
-			} else {
-				return 0, err
-			}
-		} else {
-			article.Article_display = 0
-			if num, err := o.Update(&article); err == nil {
-				return num, err
-			} else {
-				return 0, err
-			}
-		}
-	} else {
-		return 0, err
-	}
-}
+//// 上下线一篇文章 (完成)
+//func ArticleActivityOne(id string) (int64, error) {
+//	o := orm.NewOrm()
+//	article := Xinfei_article{Article_id: id}
+//	if err := o.Read(&article); err == nil {
+//		if article.Article_display == 0 {
+//			article.Article_display = 1
+//			if num, err := o.Update(&article); err == nil {
+//				return num, err
+//			} else {
+//				return 0, err
+//			}
+//		} else {
+//			article.Article_display = 0
+//			if num, err := o.Update(&article); err == nil {
+//				return num, err
+//			} else {
+//				return 0, err
+//			}
+//		}
+//	} else {
+//		return 0, err
+//	}
+//}
 
-// 查询一篇文章
+// 查询一篇文章详情内容
 func ArticleSeleteOne(id string) (Xinfei_article, error) {
 	o := orm.NewOrm()
 	article := Xinfei_article{Article_id: id}
@@ -97,14 +98,50 @@ func ArticleSeleteOne(id string) (Xinfei_article, error) {
 	}
 }
 
-// 查询全部文章
-func ArticleSeleteAll() ([]Xinfei_article, error) {
+/**
+ * 传入参数：是否上架的（空为全部查询），第几页，一页几行，升降序关键词
+ * 查询全部文章
+ * return 查询的数据，受影响行数，错误
+ */
+func ArticleSeleteAll(p int, num int, adc string, hot bool) ([]Xinfei_article, int64, error) {
 	o := orm.NewOrm()
 	article := []Xinfei_article{}
-	_, err := o.Raw("SELECT * FROM xinfei_article").QueryRows(&article)
-	if err == nil {
-		return article, err
+	sql := ""
+	if hot {
+		if p == 1 {
+			sql = "SELECT * FROM xinfei_article" + " ORDER BY article_hot " + adc + " limit 0" + "," + strconv.Itoa(num)
+		} else if p > 1 {
+			s := p*num - num
+			sql = "SELECT * FROM xinfei_article" + " ORDER BY article_hot " + adc + " limit " + strconv.Itoa(s) + "," + strconv.Itoa(num)
+		} else {
+			sql = "SELECT * FROM xinfei_article" + " ORDER BY article_hot " + adc + " limit 0" + "," + strconv.Itoa(num)
+		}
 	} else {
-		return article, err
+		if p == 1 {
+			sql = "SELECT * FROM xinfei_article" + " ORDER BY article_date " + adc + " limit 0" + "," + strconv.Itoa(num)
+		} else if p > 1 {
+			s := p*num - num
+			sql = "SELECT * FROM xinfei_article" + " ORDER BY article_date " + adc + " limit " + strconv.Itoa(s) + "," + strconv.Itoa(num)
+		} else {
+			sql = "SELECT * FROM xinfei_article" + " ORDER BY article_date " + adc + " limit 0" + "," + strconv.Itoa(num)
+		}
 	}
+	// 返回行数或者错误信息
+	if num, err := o.Raw(sql).QueryRows(&article); err == nil {
+		if p == 0 {
+			return article, num, err
+		} else {
+			cnt, _ := o.QueryTable("xinfei_article").Count()
+			return article, cnt, err
+		}
+	} else {
+		return article, 0, err
+	}
+}
+
+//获取文章表中的文章数量
+func GetArticleCount() int64 {
+	o := orm.NewOrm()
+	cnt, _ := o.QueryTable("xinfei_article").Count()
+	return cnt
 }

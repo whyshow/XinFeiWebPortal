@@ -89,6 +89,6 @@
   </footer>
   <div class="backdrop"></div>
 
-  <script src="/static/js/reload.min.js"></script>
+  <script src="/static/admin/js/reload.min.js"></script>
 </body>
 </html>

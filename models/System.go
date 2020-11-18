@@ -12,6 +12,9 @@ import (
 	"syscall"
 )
 
+/**
+ * 系统信息显示数据模型
+ */
 type SystemStatus struct {
 	DiskAll              string //全部磁盘大小
 	DiskUsed             string //磁盘已使用量
