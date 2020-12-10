@@ -6,10 +6,8 @@ import (
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
 	"math"
-	"os"
 	"runtime"
 	"strconv"
-	"syscall"
 )
 
 /**
@@ -38,11 +36,11 @@ type SystemStatus struct {
 
 func GetSystemStatus() (system SystemStatus) {
 	//磁盘
-	disk := DiskStat()
+	/**	disk := DiskStat()
 	system.DiskAll = strconv.FormatUint(disk.All, 10) + "." + strconv.FormatUint(disk.Rem, 10)
 	system.DiskUsed = strconv.FormatUint(disk.Used, 10)
 	system.DiskFree = strconv.FormatUint(disk.Free, 10)
-	system.DiskPercentage = strconv.FormatUint(disk.Percentage, 10)
+	system.DiskPercentage = strconv.FormatUint(disk.Percentage, 10)**/
 	//内存
 	memory := MemStat()
 	system.MemoryAll = strconv.FormatUint(memory.All, 10) + "." + strconv.FormatUint(memory.Rem, 10)
@@ -78,6 +76,7 @@ type DiskStatus struct {
 	Percentage uint64 `json:"percentage"`
 }
 
+/**
 // 磁盘总量、使用量、剩余量
 func DiskStat() (disk DiskStatus) {
 	fs := syscall.Statfs_t{}
@@ -104,7 +103,7 @@ func DiskStat() (disk DiskStatus) {
 
 	return
 }
-
+**/
 type MemStatus struct {
 	All         uint64  `json:"all"`
 	Used        uint64  `json:"used"`

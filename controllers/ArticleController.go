@@ -27,8 +27,12 @@ func (c *ArticleController) ArticleHome() {
 			c.Data["json"] = map[string]interface{}{"code": 1, "message": "请求成功", "time": utils.Millisecond(time.Since(t)), "result": article, "page": utils.Paginator(p, num, nums)}
 		}
 	}
-
 	c.TplName = "admin/文章列表及管理页面.html"
+}
+
+// 添加文章页面
+func (c *ArticleController) ArticleAddPage() {
+	c.TplName = "admin/添加文章页面.html"
 }
 
 // 添加一篇文章
@@ -36,8 +40,53 @@ func (c *ArticleController) ArticleAddOne() {
 	t := time.Now()
 	article := models.Xinfei_article{}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &article); err == nil {
+		nameRune := []rune(article.Article_text)
+		// 文章文本取前100字
+		if len(nameRune) > 150 {
+			article.Article_text = string(nameRune[0:150])
+		} else {
+			article.Article_text = string(nameRune[0:len(nameRune)])
+		}
 		if err := models.ArticleInsertOne(article); err == nil {
 			c.Data["json"] = map[string]interface{}{"code": 1, "message": "添加成功", "time": utils.Millisecond(time.Since(t)), "result": err}
+			c.ServeJSON()
+		} else {
+			c.Data["json"] = map[string]interface{}{"code": 0, "message": "错误", "time": utils.Millisecond(time.Since(t)), "result": err}
+			c.ServeJSON()
+		}
+	} else {
+		c.Data["json"] = map[string]interface{}{"code": 0, "message": "参数错误", "time": utils.Millisecond(time.Since(t)), "result": err}
+		c.ServeJSON()
+	}
+}
+
+//修改文章页面
+func (c *ArticleController) ArticleAlterPage() {
+	t := time.Now()
+	if article, err := models.ArticleSeleteOne(c.GetString(":id")); err == nil {
+		c.Data["json"] = map[string]interface{}{"code": 1, "message": "查询成功", "time": utils.Millisecond(time.Since(t)), "result": article}
+		c.TplName = "admin/修改文章页面.html"
+	} else {
+		c.Data["json"] = map[string]interface{}{"code": 0, "message": "查询失败", "time": utils.Millisecond(time.Since(t)), "result": err}
+		c.ServeJSON()
+	}
+
+}
+
+//修改文章
+func (c *ArticleController) ArticleAlter() {
+	t := time.Now()
+	article := models.Xinfei_article{}
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &article); err == nil {
+		nameRune := []rune(article.Article_text)
+		// 文章文本取前100字
+		if len(nameRune) > 150 {
+			article.Article_text = string(nameRune[0:150])
+		} else {
+			article.Article_text = string(nameRune[0:len(nameRune)])
+		}
+		if _, err := models.ArticleUpdateOne(article); err == nil {
+			c.Data["json"] = map[string]interface{}{"code": 1, "message": "修改成功", "time": utils.Millisecond(time.Since(t)), "result": err}
 			c.ServeJSON()
 		} else {
 			c.Data["json"] = map[string]interface{}{"code": 0, "message": "错误", "time": utils.Millisecond(time.Since(t)), "result": err}
@@ -52,7 +101,7 @@ func (c *ArticleController) ArticleAddOne() {
 //根据文章id删除一篇文章
 func (c *ArticleController) ArticleDeleteOne() {
 	t := time.Now()
-	if _, err := models.ArticleDeleteOne(c.Ctx.Input.Param("id")); err == nil {
+	if _, err := models.ArticleDeleteOne(c.GetString("article_id")); err == nil {
 		c.Data["json"] = map[string]interface{}{"code": 1, "message": "删除成功", "time": utils.Millisecond(time.Since(t)), "result": err}
 		c.ServeJSON()
 	} else {

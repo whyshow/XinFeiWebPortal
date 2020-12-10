@@ -44,8 +44,16 @@ func (c *UserController) UserListPage() {
 func (c *UserController) UserAdd() {
 	t := time.Now()
 	user := models.Xinfei_user{}
+
 	//json数据封装到user对象中
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &user); err == nil {
+		//校验数据
+		if user.User_account == "" || user.User_name == "" || user.User_motto == "" {
+			c.Data["json"] = map[string]interface{}{"code": -1, "message": "增加失败", "time": utils.Millisecond(time.Since(t)), "result": "信息不完整"}
+			c.ServeJSON()
+			return
+		}
+
 		if err := models.UserInsertOne(user); err == nil {
 			c.Data["json"] = map[string]interface{}{"code": 1, "message": "增加成功", "time": utils.Millisecond(time.Since(t)), "result": "/admin/member"}
 			c.ServeJSON()
@@ -124,6 +132,13 @@ func (c *UserController) UserAlterInfo() {
 	t := time.Now()
 	user := models.Xinfei_user{}
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &user); err == nil {
+		//校验数据
+		if user.User_account == "" || user.User_name == "" || user.User_motto == "" {
+			c.Data["json"] = map[string]interface{}{"code": -1, "message": "增加失败", "time": utils.Millisecond(time.Since(t)), "result": "信息不完整"}
+			c.ServeJSON()
+			return
+		}
+
 		if num, err := models.UserUpdateOne(user); err == nil {
 			c.Data["json"] = map[string]interface{}{"code": num, "message": "修改成功", "time": utils.Millisecond(time.Since(t)), "result": err}
 			c.ServeJSON()

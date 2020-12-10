@@ -16,18 +16,21 @@ type Xinfei_article struct {
 	Article_id       string `orm:"column(article_id);pk"` //文章id
 	Article_title    string //文章标题
 	Article_user     string //文章发布作者
+	Article_html     string // 文章内容
 	Article_text     string // 文章内容
 	Article_category string //文章类别
 	Article_date     string //文章发布时间
+	Article_display  int64  //文章是否显示
 	Article_hot      int64  //文章热度
 }
 
 // 插入一篇文章
 func ArticleInsertOne(artivle Xinfei_article) error {
 	o := orm.NewOrm()
-	artivle.Article_id = utils.Random(6)                            //生成文章id
-	artivle.Article_hot = 1                                         //文章默认热度为 1
-	artivle.Article_date = time.Now().Format("2006-01-02 15:04:05") //添加文章的日期时间
+	artivle.Article_id = utils.Random(6) //生成文章id
+	artivle.Article_hot = 1              //文章默认热度为 1
+	artivle.Article_display = 0
+	artivle.Article_date = time.Now().Format("2006-01-02") //添加文章的日期时间
 	if _, err := o.Insert(&artivle); err == nil {
 		return err
 	} else {
@@ -53,6 +56,7 @@ func ArticleUpdateOne(artivle Xinfei_article) (int64, error) {
 // 删除一篇文章 (完成)
 func ArticleDeleteOne(id string) (int64, error) {
 	o := orm.NewOrm()
+
 	if num, err := o.Delete(&Xinfei_article{Article_id: id}); err == nil {
 		return num, err
 	} else {
@@ -88,12 +92,13 @@ func ArticleDeleteOne(id string) (int64, error) {
 // 查询一篇文章详情内容
 func ArticleSeleteOne(id string) (Xinfei_article, error) {
 	o := orm.NewOrm()
+	// 文章热度 + 1
 	article := Xinfei_article{Article_id: id}
+	o.Raw("update xinfei_article set article_hot = article_hot + 1 where article_id = ?", id).Exec()
 	if err := o.Read(&article); err == nil {
-		// 文章热度 + 1
-		o.Raw("update xinfei_article set article_hot = article_hot + 1 where article_id = ?", id).Exec()
 		return article, err
 	} else {
+		o.Raw("update xinfei_article set article_hot = article_hot - 1 where article_id = ?", id).Exec()
 		return article, err
 	}
 }
@@ -128,6 +133,9 @@ func ArticleSeleteAll(p int, num int, adc string, hot bool) ([]Xinfei_article, i
 	}
 	// 返回行数或者错误信息
 	if num, err := o.Raw(sql).QueryRows(&article); err == nil {
+		for key, _ := range article {
+			article[key].Article_html = ""
+		}
 		if p == 0 {
 			return article, num, err
 		} else {

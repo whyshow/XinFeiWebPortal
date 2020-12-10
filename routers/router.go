@@ -10,6 +10,9 @@ func init() {
 	beego.Router("/", &controllers.WebController{}, "GET:Home")
 
 	// Admin
+
+	beego.Router("/index.php/*", &controllers.AdminController{}, "GET:RedirectHome")
+
 	beego.Router("admin/", &controllers.AdminController{}, "GET:Home")
 	beego.Router("admin/welcome", &controllers.AdminController{}, "GET:Welcome")
 	beego.Router("admin/login", &controllers.AdminController{}, "GET:LoginPage")
@@ -28,19 +31,21 @@ func init() {
 	beego.Router("admin/user/alter/user", &controllers.UserController{}, "POST:UserAlterInfo")                 // 修改用户信息
 	beego.Router("admin/user/query/user", &controllers.UserController{}, "POST:UserQuery")                     // 条件查询
 	// 文章
-	beego.Router("admin/article/home", &controllers.ArticleController{}, "GET:ArticleHome")
-	beego.Router("admin/article/query", &controllers.ArticleController{}, "GET:ArticleQueryAllDate")
-	beego.Router("article/add", &controllers.ArticleController{}, "POST:ArticleAddOne")
+	beego.Router("admin/article/home", &controllers.ArticleController{}, "GET:ArticleHome")                //文章管理页面
+	beego.Router("admin/article/query", &controllers.ArticleController{}, "GET:ArticleQueryAllDate")       // 查询使用文章
+	beego.Router("admin/article/page/add", &controllers.ArticleController{}, "GET:ArticleAddPage")         //增加文章页面
+	beego.Router("admin/article/page/alter/:id", &controllers.ArticleController{}, "GET:ArticleAlterPage") //修改文章页面
+	beego.Router("admin/article/alter", &controllers.ArticleController{}, "POST:ArticleAlter")             //修改文章
 
-	beego.Router("/article/:id", &controllers.ArticleController{}, "GET:ArticleQueryOne")
+	beego.Router("admin/article/delete", &controllers.ArticleController{}, "POST:ArticleDeleteOne") //删除一篇文章
+	beego.Router("admin/article/add", &controllers.ArticleController{}, "POST:ArticleAddOne")       //增加一篇文章
+	beego.Router("admin/article/:id", &controllers.ArticleController{}, "GET:ArticleQueryOne")      //根据文章id查询文章详情
+
+	//uploading
+	beego.Router("admin/uploading/image", &controllers.UploadingController{}, "POST:UploadingImage")   //上传图片
+	beego.Router("admin/uploading/selfie", &controllers.UploadingController{}, "POST:UploadingSelfie") //上传自拍照
 
 	//API
-	beego.Router("/member", &controllers.UserController{}, "GET:MemberAll")                  // 查询成员
-	beego.Router("/member/:id", &controllers.UserController{}, "GET:UserQueryOne")           // 查询成员详情
-	beego.Router("/article", &controllers.ArticleController{}, "GET:ArticleQueryAllDate")    //查询文章列表（按日期）
-	beego.Router("/article/hot", &controllers.ArticleController{}, "GET:ArticleQueryAllHot") //查询文章列表（按热度值）
-	beego.Router("/article/:id", &controllers.ArticleController{}, "GET:ArticleQueryOne")    // 查询文章详情
-
 	beego.Router("admin/getsystemstatus", &controllers.AdminController{}, "GET:GetSystemStatus") //返回JSON数据
 	beego.Router("admin/reboot_system", &controllers.AdminController{}, "GET:RebootSystem")      //重启系统
 

@@ -37,13 +37,14 @@
                                     <input type="text" id="queryuser" name="username" placeholder="请输入" autocomplete="off" class="layui-input">
                                 </div>
                                 <div class="layui-inline layui-show-xs-block">
-                                    <button type="button" onclick="cx()" class="layui-btn"><i class="layui-icon">&#xe615;</i></button>
+                                    <button type="button layui-btn-disabled" onclick="cx()" class="layui-btn"><i class="layui-icon">&#xe615;</i></button>
                                 </div>
                             </form>
                         </div>
                         <div class="layui-card-header">
                             <button class="layui-btn" onclick="xadmin.open('添加用户','/admin/user/page/add',700,600)"><i class="layui-icon"></i>添加</button>
-                            <button class="layui-btn" onclick="xadmin.open('批量添加用户','/admin/user/add_page',700,600)"><i class="layui-icon"></i>批量添加</button>
+                            <button class="layui-btn layui-btn-disabled"><i class="layui-icon"></i>批量添加</button>
+                            <!--<button class="layui-btn layui-btn-disabled" onclick="xadmin.open('批量添加用户','/admin/user/add_page',700,600)"><i class="layui-icon"></i>批量添加</button> -->
 
                         </div>
                         <div class="layui-card-body layui-table-body layui-table-main">
@@ -65,7 +66,7 @@
                                 {{range .json.result}}
                                   <tr class="text-center">
                                       <td>{{.User_account}}</td>
-                                      <td><img style="height: 37px;width: 30px" src="../../static/img/1.jpg"></td>
+                                      <td><img style="height: 37px;width: 30px" src="{{.User_icon}}"></td>
                                     <td>{{if .User_permission}}<span style="margin-right: 0px;float: left" class="layui-badge">管</span>{{end}}{{.User_name}}</td>
                                     <td>{{.User_qq}}</td>
                                     <td>{{.User_phone}}</td>

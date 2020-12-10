@@ -1,0 +1,49 @@
+{
+  "appbar": [
+    {
+      "name": "首页",
+      "url": "/",
+      "children": []
+    },
+    {
+      "name": "信飞动态",
+      "url": "/news",
+      "children": []
+    },
+    {
+      "name": "关于我们",
+      "url": "/about",
+      "children": [
+        {
+          "cname": "信飞简介",
+          "curl": "/about"
+        },
+        {
+          "cname": "成员介绍",
+          "curl": "/member"
+        },
+        {
+          "cname": "成果展示",
+          "curl": "/achievement"
+        }
+      ]
+    },
+    {
+      "name": "科大讯飞",
+      "url": "/iflytek",
+      "children": [
+        {
+          "cname": "信飞简介",
+          "curl": "/iflytek"
+        },
+        {
+          "cname": "科大讯飞班",
+          "curl": "/iflytek_class"
+        }
+      ]
+    },{
+      "name": "加入我们",
+      "url": "/join"
+    }
+  ]
+}

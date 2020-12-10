@@ -19,20 +19,32 @@
             <input type="text" id="studentnumber" value="{{.json.result.User_account}}" class="layui-input layui-btn-disabled">
         </div>
     </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">姓名</label>
-        <div class="layui-input-inline">
-            <input type="text" id="name" placeholder="请输入姓名" value="{{.json.result.User_name}}" autocomplete="off"
-                   class="layui-input">
+
+    <div class="layui-inline">
+        <div class="layui-form-item">
+            <label class="layui-form-label">姓名</label>
+            <div class="layui-input-inline">
+                <input type="text" id="name" placeholder="请输入姓名" value="{{.json.result.User_name}}" autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">专业方向</label>
+            <div class="layui-input-inline">
+                <input type="text" id="direction" placeholder="请输入专业方向" value="{{.json.result.User_direction}}"
+                       autocomplete="off" class="layui-input">
+            </div>
         </div>
     </div>
 
-    <div class="layui-form-item">
-        <label class="layui-form-label">专业方向</label>
-        <div class="layui-input-inline">
-            <input type="text" id="direction" placeholder="请输入专业方向" value="{{.json.result.User_direction}}"
-                   autocomplete="off" class="layui-input">
-        </div>
+    <div class="layui-inline">
+        <button type="button" class="layui-btn" id="uplodingselfie" name="uplodingselfie">
+            <i class="layui-icon">&#xe67c;</i>上传简照
+        </button>
+    </div>
+
+    <div class="layui-inline">
+        <img id="xmTanImg" src="{{.json.result.User_icon}}" width="91px" height="130px"/><br />
     </div>
 
     <div class="layui-form-item">
@@ -97,6 +109,47 @@
 <script src="/static/admin/js/jquery.min.js" charset="utf-8"></script>
 <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
 <script>
+
+    var icon = {{.json.result.User_icon}}
+    layui.use('upload', function(){
+        var upload = layui.upload;
+        //执行实例
+        var uploadInst = upload.render({
+            elem: '#uplodingselfie' //绑定元素
+            ,acceptMime: 'image/*'
+            ,exts:'jpg|png|jpeg'
+            ,url: '/admin/uploading/selfie' //上传接口
+            ,auto: true //选择文件后不自动上传
+            ,choose: function(obj){
+                //将每次选择的文件追加到文件队列
+                var files = obj.pushFile();
+                oj = obj
+                //预读本地文件，如果是多文件，则会遍历。(不支持ie8/9)
+                oj.preview(function(index, file, result){
+                    var img = document.getElementById("xmTanImg");
+                    img.src = result;
+                });
+            }
+            ,done: function(res){
+                if (res.code == 0){
+                    icon = res.msg
+                }else {
+                    oj = null
+                    layer.open({
+                        title: '服务端提示'
+                        ,content: res.msg
+                    });
+                }
+                //上传完毕回调
+            }
+            ,error: function(){
+                //请求异常回调
+            }
+        });
+    });
+
+
+
     layui.use('form', function(){
         var form = layui.form; //只有执行了这一步，部分表单元素才会自动修饰成功
         form.render();
@@ -109,6 +162,7 @@
         data["User_class"] = $("#class").val()
         var j = parseInt($("#permission").val())
         data["User_permission"] = j
+        data["User_icon"] = icon
         data["User_direction"] = $("#direction").val()
         data["User_qq"] = $("#qq").val()
         data["User_phone"] = $("#phonenumber").val()

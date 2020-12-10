@@ -19,6 +19,10 @@ func (c *AdminController) Home() {
 	c.Data["info"] = models.QueryAdmin(id)
 	c.TplName = "admin/后台首页页面.html"
 }
+func (c *AdminController) RedirectHome() {
+	c.Redirect("/admin", 302)
+
+}
 
 // 基础信息统计显示页面
 func (c *AdminController) Welcome() {
