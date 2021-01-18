@@ -34,9 +34,7 @@ func main() {
 	//Config()
 	//注册新的错误设置 404/401/502
 	beego.ErrorController(&controllers.ErrorController{})
-	//注册过滤器  判断在用户访问admin后台时是否处于登录状态，如果没有登录，则跳转到 登录页面
-	beego.InsertFilter("/admin/*", beego.BeforeRouter, FilterUser)
-	beego.InsertFilter("/*", beego.BeforeRouter, Record)
+
 	//自动更新up pu量
 	//models.TimerUpPUTask()
 	//打开session
@@ -55,7 +53,9 @@ func main() {
 		//如果设置，则允许共享身份验证凭据，例如cookie
 		AllowCredentials: true,
 	}))
-	beego.Run()
+	//注册过滤器  判断在用户访问admin后台时是否处于登录状态，如果没有登录，则跳转到 登录页面
+	beego.InsertFilter("/admin/*", beego.BeforeRouter, FilterUser)
+	beego.InsertFilter("/*", beego.BeforeRouter, Record)
 	beego.Run()
 }
 

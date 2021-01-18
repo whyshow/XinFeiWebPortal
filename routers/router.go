@@ -45,6 +45,8 @@ func init() {
 	beego.Router("admin/uploading/image", &controllers.UploadingController{}, "POST:UploadingImage")   //上传图片
 	beego.Router("admin/uploading/selfie", &controllers.UploadingController{}, "POST:UploadingSelfie") //上传自拍照
 
+	// 获奖
+	beego.Router("admin/honor/page", &controllers.HonorController{}, "GET:HonorHonePage") //上传自拍照
 	//API
 	beego.Router("admin/getsystemstatus", &controllers.AdminController{}, "GET:GetSystemStatus") //返回JSON数据
 	beego.Router("admin/reboot_system", &controllers.AdminController{}, "GET:RebootSystem")      //重启系统
